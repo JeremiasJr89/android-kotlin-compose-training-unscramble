@@ -15,13 +15,15 @@
  */
 package com.example.android.unscramble.ui
 
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+
 /**
  * Data class that represents the game UI state
  */
 data class GameUiState(
     val currentScrambledWord: String = "",
-    val currentWordCount: Int = 1,
-    val score: Int = 0,
     val isGuessedWordWrong: Boolean = false,
-    val isGameOver: Boolean = false
+    val score: Int = 0,
+    val currentWordCount:Int = 1
 )

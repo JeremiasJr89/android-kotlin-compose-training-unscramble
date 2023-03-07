@@ -60,15 +60,12 @@ fun GameScreen(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        GameStatus(
-            wordCount = gameUiState.currentWordCount,
-            score = gameUiState.score
-        )
+        GameStatus()
         GameLayout(
-            onUserGuessChanged = { gameViewModel.updateUserGuess(it) },
             userGuess = gameViewModel.userGuess,
+            currentScrambledWord = gameUiState.currentScrambleWord,
+            onUserGuessChanged = { gameViewModel.updateUserGuess(it) },
             onKeyboardDone = { gameViewModel.checkUserGuess() },
-            currentScrambledWord = gameUiState.currentScrambledWord,
             isGuessWrong = gameUiState.isGuessedWordWrong
         )
         Row(
@@ -77,8 +74,9 @@ fun GameScreen(
                 .padding(top = 16.dp),
             horizontalArrangement = Arrangement.SpaceAround
         ) {
+            Text(stringResource(R.string.word_count, wordCount))
             OutlinedButton(
-                onClick = { gameViewModel.skipWord() },
+                onClick = { },
                 modifier = Modifier
                     .weight(1f)
                     .padding(end = 8.dp)
@@ -95,17 +93,11 @@ fun GameScreen(
                 Text(stringResource(R.string.submit))
             }
         }
-        if (gameUiState.isGameOver) {
-            FinalScoreDialog(
-                score = gameUiState.score,
-                onPlayAgain = { gameViewModel.resetGame() }
-            )
-        }
     }
 }
 
 @Composable
-fun GameStatus(wordCount: Int, score: Int, modifier: Modifier = Modifier) {
+fun GameStatus(modifier: Modifier = Modifier) {
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -113,14 +105,14 @@ fun GameStatus(wordCount: Int, score: Int, modifier: Modifier = Modifier) {
             .size(48.dp),
     ) {
         Text(
-            text = stringResource(R.string.word_count, wordCount),
+            text = stringResource(R.string.word_count, 0),
             fontSize = 18.sp,
         )
         Text(
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentWidth(Alignment.End),
-            text = stringResource(R.string.score, score),
+            text = stringResource(R.string.score, 0),
             fontSize = 18.sp,
         )
     }
@@ -128,11 +120,11 @@ fun GameStatus(wordCount: Int, score: Int, modifier: Modifier = Modifier) {
 
 @Composable
 fun GameLayout(
-    currentScrambledWord: String,
     isGuessWrong: Boolean,
     userGuess: String,
     onUserGuessChanged: (String) -> Unit,
     onKeyboardDone: () -> Unit,
+    currentScrambledWord: String,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -152,12 +144,12 @@ fun GameLayout(
             value = userGuess,
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
-            onValueChange = onUserGuessChanged,
+            onValueChange = { },
             label = {
                 if (isGuessWrong) {
-                    Text(stringResource(R.string.wrong_guess))
+                    Text(stringResource(id = (R.string.wrong_guess)))
                 } else {
-                    Text(stringResource(R.string.enter_your_word))
+                    Text(stringResource(id = R.string.enter_your_word))
                 }
             },
             isError = isGuessWrong,
@@ -176,7 +168,6 @@ fun GameLayout(
  */
 @Composable
 private fun FinalScoreDialog(
-    score: Int,
     onPlayAgain: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -189,7 +180,7 @@ private fun FinalScoreDialog(
             // onCloseRequest.
         },
         title = { Text(stringResource(R.string.congratulations)) },
-        text = { Text(stringResource(R.string.you_scored, score)) },
+        text = { Text(stringResource(R.string.you_scored, 0)) },
         modifier = modifier,
         dismissButton = {
             TextButton(
@@ -201,7 +192,11 @@ private fun FinalScoreDialog(
             }
         },
         confirmButton = {
-            TextButton(onClick = onPlayAgain) {
+            TextButton(
+                onClick = {
+                    onPlayAgain()
+                }
+            ) {
                 Text(text = stringResource(R.string.play_again))
             }
         }
